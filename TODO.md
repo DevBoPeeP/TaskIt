@@ -1,0 +1,2 @@
+- [x] Update components/SignUpForm.tsx to navigate to /otp with email query param on successful submit
+- [x] Update app/otp/page.tsx to read email from query params and pass to OtpForm
