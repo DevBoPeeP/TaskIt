@@ -1,6 +1,6 @@
 "use client";
 
-import OtpForm from "@/components/otpForm";
+import OtpForm from "@/components/OtpForm";
 
 export default function OtpPage() {
   return <OtpForm />;

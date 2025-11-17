@@ -56,12 +56,12 @@ export default function OtpForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center  py-[4rem]">
+    <div className="flex flex-col items-center justify-center py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className=" p-4 sm:p-10  w-[500px] text-center mt-8"
+        className="bg-white shadow-lg rounded-3xl p-4 sm:p-10  w-[500px] text-center mt-8"
       >
         <BadgeCheck className="mx-auto text-purple-400 w-12 h-12 mb-3" />
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
