@@ -47,7 +47,7 @@ export default function SideMenu() {
       onMouseLeave={handleMouseLeave}
       PaperProps={{
         sx: {
-          width: open ? 240 : 70,
+          width: open ? 240 : 100,
           height: "100vh",
           transition: "width 0.3s ease",
           overflowX: "hidden",

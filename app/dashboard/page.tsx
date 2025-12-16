@@ -1,7 +1,10 @@
+"use client";
+
 import SideMenu from "@/components/SideMenu";
 import MainAppBar from "@/components/AppBar";
 import MainContent from "@/components/MainContent";
 import Box from "@mui/material/Box";
+import SideContent from "@/components/SideContent";
 
 export default function DashboardHomePage() {
   return (
@@ -18,7 +21,6 @@ export default function DashboardHomePage() {
         sx={{
           display: "grid",
           gridTemplateColumns: "80px 1fr 1fr 1fr",
-          gap: 1,
           gridTemplateRows: "auto",
           gridTemplateAreas: `"header header header header"
           "sidemenu main main sidecontent"`,
@@ -41,18 +43,19 @@ export default function DashboardHomePage() {
         <Box
           sx={{
             gridArea: "main",
-            gridColumn: " 2/span 3",
+            gridColumn: " 2 / span 2",
           }}
         >
           <MainContent />
         </Box>
         <Box
           sx={{
+            marginLeft: 2,
             gridArea: "sidecontent",
-            backgroundColor: "red",
+            gridColumn: "span 3",
           }}
         >
-          Side Content
+          <SideContent />
         </Box>
       </Box>
     </Box>

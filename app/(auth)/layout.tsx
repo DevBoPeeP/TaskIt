@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function AuthLayout({
   children,
@@ -15,7 +16,7 @@ export default function AuthLayout({
       {isLogin ? (
         <>
           <div className="min-h-screen w-1/2 flex items-center justify-center bg-gray-50">
-            {children}
+            <AuthProvider>{children}</AuthProvider>
           </div>
 
           <div className="hidden lg:flex w-[520px] h-[720px] flex-col gradient active:scale-95 border-2 border-[#f0f0f0] rounded-[5%] m-8 relative overflow-hidden">

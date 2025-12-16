@@ -20,9 +20,9 @@ import MoreIcon from "@mui/icons-material/MoreVert";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: "#f5f5f5",
   "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: "#eeeeee",
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -50,9 +50,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
   },
 }));
 
@@ -169,8 +166,14 @@ export default function MainAppBar() {
         }}
       >
         <Toolbar>
-          <Image alt="Logo" src="/taskit.png" width={120} height={40} />
-          <Search sx={{ mx: "auto" }}>
+          <Image alt="Logo" src="/taskit.png" width={120} height={30} />
+          <Search
+            sx={{
+              mx: "auto",
+              width: { xs: "90%", sm: "70%", md: "400px" },
+              maxWidth: "500px",
+            }}
+          >
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>

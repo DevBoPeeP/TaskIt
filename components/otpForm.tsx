@@ -3,13 +3,20 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { verifyOtp, resendOtp } from "@/services/otpService";
 
 export default function OtpForm() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "your email";
+  const router = useRouter();
+
+  const email = searchParams.get("email") || "";
+
+  const isOtpComplete = otp.every((digit) => digit !== "");
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>, index: number) => {
     const value = e.currentTarget.value;
@@ -19,7 +26,6 @@ export default function OtpForm() {
     updated[index] = value;
     setOtp(updated);
 
-    // Move focus to next input automatically
     if (value && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -40,18 +46,40 @@ export default function OtpForm() {
     if (/^\d+$/.test(pasted)) {
       const arr = pasted.split("");
       setOtp(arr.concat(Array(6 - arr.length).fill("")));
-      arr.forEach((digit, i) => {
-        if (inputRefs.current[i]) inputRefs.current[i]!.value = digit;
-      });
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const code = otp.join("");
-    if (code.length === 6) {
-      alert(`Entered OTP: ${code}`);
-    } else {
-      alert("Please enter all 6 digits");
+
+    if (code.length !== 6) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await verifyOtp(email, code);
+
+      if (res.responseCode === "00" && res.token) {
+        localStorage.setItem("token", res.token);
+
+        router.push("/dashboard");
+      } else {
+        setError(res.responseMessage);
+      }
+    } catch {
+      setError("OTP verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    try {
+      await resendOtp(email);
+      setError("OTP resent successfully");
+    } catch {
+      setError("Failed to resend OTP");
     }
   };
 
@@ -61,17 +89,19 @@ export default function OtpForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="bg-white shadow-lg rounded-3xl p-4 sm:p-10  w-[500px] text-center mt-8"
+        className="bg-white shadow-lg rounded-3xl p-4 sm:p-10 w-[500px] text-center mt-8"
       >
         <BadgeCheck className="mx-auto text-purple-400 w-12 h-12 mb-3" />
+
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
           Verify Your Account
         </h2>
+
         <p className="text-gray-500 text-sm sm:text-base mb-6">
-          Please enter the 6-digit verification code sent to {email}
+          Enter the 6-digit code sent to <b>{email}</b>
         </p>
 
-        <div className="flex justify-center gap-2 sm:gap-4 mb-8">
+        <div className="flex justify-center gap-2 sm:gap-4 mb-4">
           {otp.map((value, index) => (
             <input
               key={index}
@@ -90,11 +120,25 @@ export default function OtpForm() {
           ))}
         </div>
 
+        {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
+
         <button
           onClick={handleSubmit}
-          className="bg-purple-300 hover:bg-purple-500 text-gray-800 font-bold rounded-full px-8 py-2 sm:py-3 text-sm sm:text-base transition-colors"
+          disabled={loading}
+          className={`font-bold rounded-full px-8 py-2 sm:py-3 w-full transition-colors mb-3 ${
+            isOtpComplete
+              ? "bg-purple-500 hover:bg-purple-600 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
-          Confirm
+          {loading ? "Verifying..." : "Confirm"}
+        </button>
+
+        <button
+          onClick={handleResend}
+          className="text-sm text-purple-500 underline"
+        >
+          Resend OTP
         </button>
       </motion.div>
     </div>

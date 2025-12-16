@@ -2,15 +2,25 @@
 
 import React, { useState, ChangeEvent, ReactNode } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Lock } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { loginUser } from "@/services/authService";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginForm() {
+  const router = useRouter();
+  const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     usernameOrEmail: "",
     password: "",
     rememberMe: false,
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e: {
     target: { name: string; type: string; value: string; checked: boolean };
@@ -22,9 +32,29 @@ export default function LoginForm() {
     });
   };
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Welcome, ${formData.usernameOrEmail}!`);
+    setError("");
+
+    try {
+      setLoading(true);
+
+      const res = await loginUser({
+        usernameOrEmail: formData.usernameOrEmail,
+        password: formData.password,
+      });
+
+      if (res.responseCode === "00" && res.token) {
+        login(res.token);
+        router.push("/dashboard");
+      } else {
+        setError(res.responseMessage);
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,6 +84,8 @@ export default function LoginForm() {
           icon={<Lock className="size-5" />}
         />
 
+        {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -67,7 +99,7 @@ export default function LoginForm() {
               name="rememberMe"
               checked={formData.rememberMe}
               onChange={handleChange}
-              className=" accent-indigo-600 size-4"
+              className="accent-indigo-600 size-4"
             />
             <label htmlFor="rememberMe" className="text-gray-700">
               Remember me
@@ -85,9 +117,12 @@ export default function LoginForm() {
         >
           <button
             type="submit"
-            className="w-full h-[45px] gradient-n text-white rounded-xl hover:bg-indigo-700 transform hover:scale-105 transition"
+            disabled={loading}
+            className="w-full h-[45px] gradient-n text-white rounded-xl
+            hover:bg-indigo-700 transform hover:scale-105 transition
+            disabled:opacity-60"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </motion.div>
       </form>
@@ -98,7 +133,7 @@ export default function LoginForm() {
         transition={{ delay: 0.7 }}
         className="w-full flex items-center justify-center mt-6 space-x-2"
       >
-        <p className="text-sm font-normal text-gray-700 ">
+        <p className="text-sm font-normal text-gray-700">
           Don’t have an account?
         </p>
         <Link
@@ -147,7 +182,8 @@ function FormInput({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl
+          focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
         />
       </div>
     </motion.div>

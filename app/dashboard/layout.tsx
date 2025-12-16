@@ -17,7 +17,7 @@ export default function DashboardLayout({
     },
   });
   const pathname = usePathname();
-  const isDashboard = pathname.includes("/dashboard/home");
+  const isDashboard = pathname.includes("/dashboard");
   return (
     <ThemeProvider theme={theme}>
       <div className="w-full h-screen flex">
